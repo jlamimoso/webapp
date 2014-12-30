@@ -14,7 +14,7 @@ type Page struct {
 	Body  []byte
 }
 
-var templates = template.Must(template.ParseFiles("edit.html", "view.html"))
+var templates = template.Must(template.ParseFiles("edit.html", "view.html", "index.html"))
 
 var validPath = regexp.MustCompile("^/(edit|save|view)/([a-zA-Z0-9]+)$")
 
@@ -38,7 +38,9 @@ func viewFront(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
 		return
 	}
-	renderTemplate(w, "view", p)
+	//renderTemplate(w, "index", p) //view
+	p = nil
+	renderTemplate(w, "index", p) //view
 }
 
 func viewHandler(w http.ResponseWriter, r *http.Request) {
@@ -102,5 +104,8 @@ func main() {
 	http.HandleFunc("/view/", viewHandler)
 	http.HandleFunc("/edit/", editHandler)
 	http.HandleFunc("/save/", saveHandler)
+
+	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("http/css"))))
+
 	http.ListenAndServe(":8080", nil)
 }
