@@ -10,11 +10,15 @@ import (
 )
 
 type Page struct {
-	Title string
-	Body  []byte
+	Title          string
+	Body           []byte
+	HighSeverity   int
+	MediumSeverity int
+	LowSeverity    int
+	Total          int
 }
 
-var templates = template.Must(template.ParseFiles("edit.html", "view.html", "index.html"))
+var templates = template.Must(template.ParseFiles("edit.html", "view.html", "index.html", "templates/home.html"))
 
 var validPath = regexp.MustCompile("^/(edit|save|view)/([a-zA-Z0-9]+)$")
 
@@ -29,7 +33,7 @@ func loadPage(title string) (*Page, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &Page{Title: title, Body: body}, nil
+	return &Page{Title: title, Body: body, HighSeverity: 1, MediumSeverity: 2, LowSeverity: 3, Total: 4}, nil
 }
 
 func viewFront(w http.ResponseWriter, r *http.Request) {
@@ -39,8 +43,9 @@ func viewFront(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//renderTemplate(w, "index", p) //view
-	p = nil
+	//p = nil
 	renderTemplate(w, "index", p) //view
+	//renderTemplate(w, "home", p) //view
 }
 
 func viewHandler(w http.ResponseWriter, r *http.Request) {
@@ -105,7 +110,10 @@ func main() {
 	http.HandleFunc("/edit/", editHandler)
 	http.HandleFunc("/save/", saveHandler)
 
-	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("http/css"))))
+	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("./css/"))))
+	http.Handle("/js/", http.StripPrefix("/js/", http.FileServer(http.Dir("./js/"))))
+
+	//http.Handle("./", http.StripPrefix("/", http.FileServer(http.Dir("../assets/"))))
 
 	http.ListenAndServe(":8080", nil)
 }
