@@ -31,7 +31,7 @@ func main() {
 	defer conn.Close()
 
 	fmt.Println("About to write to connection")
-
+	i := 0
 	for {
 
 		time.Sleep(1000 * time.Millisecond)
@@ -44,6 +44,12 @@ func main() {
 
 		if n > 0 {
 			fmt.Println("Wrote ", n, " bytes to server at ", service)
+		}
+
+		i++
+		if i == 10 {
+			conn.Close()
+			return
 		}
 	}
 

@@ -7,6 +7,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"time"
 )
 
 var templates = template.Must(template.ParseFiles("echo.html"))
@@ -26,28 +27,37 @@ func recebeUDP(end string) {
 	addr, _ := net.ResolveUDPAddr("udp", end)
 	sock, _ := net.ListenUDP("udp", addr)
 	defer sock.Close()
+	m := ""
 	for {
-		rlen, _, _ := sock.ReadFromUDP(buf[:])
-		m := string(buf[0:rlen])
-		if m == "fim" {
-			close(dado)
-			return
+		sock.SetReadDeadline(time.Now().Add(20 * time.Second))
+		rlen, err := sock.Read(buf[:])
+		fmt.Printf("valor do rlen %d\n", rlen)
+		if err != nil {
+			fmt.Printf("Recebi um erro/timeout......%s\n", err.Error())
+			m = "timeout ou fora do ar"
+		} else {
+			m = string(buf[0:rlen])
 		}
 		dado <- m
 	}
 }
 
 func stop(w http.ResponseWriter, req *http.Request) {
-	quit <- 0
+	//	close(dado)
 	http.Redirect(w, req, "/", http.StatusFound)
 }
 
 func webHandler(ws *websocket.Conn) {
 	var in []byte
+	//var dado make(chan string, 100)
+
 	if err := websocket.Message.Receive(ws, &in); err != nil {
 		return
 	}
 	fmt.Printf("Received: %s\n", string(in))
+
+	//go recebeUDP(":9090", dado)
+
 	i := 0
 	for x := range dado {
 		i++
