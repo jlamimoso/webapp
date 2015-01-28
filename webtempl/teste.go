@@ -44,7 +44,17 @@ func (x tipox) teste(v int) int {
 	return x(v)
 }
 
+type router struct {
+	*httprouter.Router
+}
+
+func NewRouter() *router {
+	return &router{httprouter.New()}
+}
+
 func main() {
+	r := NewRouter()
+
 	router := httprouter.New()
 	y := tipox(mostrarX)
 	fmt.Printf("valor do tipo x %d", y.teste(2))
