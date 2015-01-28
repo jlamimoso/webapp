@@ -45,7 +45,7 @@ func viewFront(w http.ResponseWriter, r *http.Request) {
 	//renderTemplate(w, "index", p) //view
 	//p = nil
 	renderTemplate(w, "index", p) //view
-	//renderTemplate(w, "home", p) //view
+	//renderTemplate(w, "view", p) //view
 }
 
 func viewHandler(w http.ResponseWriter, r *http.Request) {
