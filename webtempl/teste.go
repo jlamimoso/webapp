@@ -44,7 +44,6 @@ func (x tipox) teste(v int) int {
 	return x(v)
 }
 
-/*
 type router struct {
 	*httprouter.Router
 }
@@ -52,7 +51,6 @@ type router struct {
 func NewRouter() *router {
 	return &router{httprouter.New()}
 }
-*/
 
 func main() {
 	//r := NewRouter()
