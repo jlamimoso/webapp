@@ -44,18 +44,23 @@ func (x tipox) teste(v int) int {
 	return x(v)
 }
 
-type router struct {
-	*httprouter.Router
-}
+/*
+var routerr *httprouter.Router
 
 func NewRouter() *router {
-	return &router{httprouter.New()}
+	router.
 }
 
+func (r *router) get(path string, h http.Handler) {
+	//r.GET(path, h)
+	r
+}
+*/
 func main() {
-	//r := NewRouter()
+	//	r := NewRouter()
 
 	router := httprouter.New()
+
 	y := tipox(mostrarX)
 	fmt.Printf("valor do tipo x %d", y.teste(2))
 	router.ServeFiles("/css/*filepath", http.Dir("./css/"))
