@@ -57,7 +57,7 @@ func main() {
 
 	router := httprouter.New()
 	y := tipox(mostrarX)
-	fmt.Printf("valor do tipo x  %d", y.teste(2))
+	fmt.Printf("valor do tipo x %d", y.teste(2))
 	router.ServeFiles("/css/*filepath", http.Dir("./css/"))
 	router.ServeFiles("/js/*filepath", http.Dir("./js/"))
 	router.GET("/", Index)
