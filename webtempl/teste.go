@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/gorilla/context"
+	"github.com/gorilla/sessions"
 	"github.com/julienschmidt/httprouter"
 	"github.com/justinas/alice"
 	"html/template"
@@ -47,20 +48,18 @@ func (x tipox) teste(v int) int {
 	return x(v)
 }
 
-/*
 type hr struct {
-	*httprouter.Router
+	rt *httprouter.Router
 }
 
 func NewRouter() *hr {
 	return &hr{httprouter.New()}
 }
-*/
 
-type hr *httprouter.Router
+//type hr *httprouter.Router
 
 func (r *hr) get(path string, h http.Handler) {
-	r.GET(path, wrapHandler(h))
+	r.rt.GET(path, wrapHandler(h))
 }
 
 func wrapHandler(h http.Handler) httprouter.Handle {
@@ -80,14 +79,34 @@ func loggingHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(fn)
 }
 
+var store = sessions.NewCookieStore([]byte("something-very-secret"))
+
 func aboutHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "You are on the about page 1.")
+	session, _ := store.Get(r, "session-name")
+	s, ok := session.Values["s1"]
+	fmt.Printf("valor do s -> %s\n", s)
+	if !ok {
+
+		session.Options.Domain = r.Host
+		session.Options.Path = "/"
+		session.Options.MaxAge = 0
+		session.Options.HttpOnly = false
+		session.Options.Secure = false
+		session.Values["s1"] = "okkkkkkkkkkkk"
+		session.Save(r, w)
+
+		fmt.Fprintf(w, "First session ! You are on the about page.")
+		return
+	}
+	session.Options.MaxAge = 1
+	fmt.Fprintf(w, "You are on the about page with session var %s.", s)
 }
 
 func main() {
-	commonHandler := alice.New(loggingHandler)
-	//r := NewRouter()
-	r := hr(httprouter.New())
+	commonHandler := alice.New(context.ClearHandler, loggingHandler)
+	r := NewRouter()
+	//x := hr(httprouter.New())
+	//r := &x
 	r.get("/about", commonHandler.ThenFunc(aboutHandler))
 	/*
 		router := httprouter.New()
@@ -102,5 +121,5 @@ func main() {
 
 		log.Fatal(http.ListenAndServe(":8080", router))
 	*/
-	log.Fatal(http.ListenAndServe(":8080", r))
+	log.Fatal(http.ListenAndServe(":8080", r.rt))
 }
